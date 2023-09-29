@@ -1,0 +1,71 @@
+AWS RDS Masterclass Commands
+for mysql
+Commands used to host MySql Server on AWS EC2 Instance
+Step 1: Update the system
+sudo apt update
+
+Step 2: Install MySql
+sudo apt install mysql-server
+
+Step 3: Check the Status of MySql (Active or Inactive)
+sudo systemctl status mysql
+
+Step 4: Login to MySql as a root
+sudo mysql
+
+Step 5: Update the password for the MySql Server
+ALTER USER 'root'@'localhost' IDENTIFIED WITH mysql_native_password BY 'Sumit5683';
+
+FLUSH PRIVILEGES;
+
+Step 6: Test the MySql server if it is working by running sample sql queries
+CREATE DATABASE mysql_test;
+
+USE mysql_test;
+
+CREATE TABLE table1 (id INT, name VARCHAR(45));
+
+INSERT INTO table1 VALUES(1, 'Virat'), (2, 'Sachin'), (3, 'Dhoni'), (4, 'ABD');
+
+SELECT * FROM table1;
+
+
+for mariaDB
+Databases on EC2 Instance - Demo
+
+Begin Configuration :
+sudo su -
+yum -y install mariadb-server wget
+systemctl enable mariadb
+systemctl start mariadb
+yum -y update
+
+Set Environmental Variables
+DBName=ec2db
+DBPassword=Sumit5683
+DBRootPassword=Sumit5683
+DBUser=ec2dbuser
+
+Database Setup on EC2 Instance:
+echo "CREATE DATABASE ${DBName};" >> /tmp/db.setup
+echo "CREATE USER '${DBUser}' IDENTIFIED BY '${DBPassword}';" >> /tmp/db.setup
+echo "GRANT ALL PRIVILEGES ON *.* TO '${DBUser}'@'%';" >> /tmp/db.setup
+echo "FLUSH PRIVILEGES;" >> /tmp/db.setup
+mysqladmin -u root password "${DBRootPassword}"
+mysql -u root --password="${DBRootPassword}" < /tmp/db.setup
+rm /tmp/db.setup
+
+Adding some dummy data to the Database inside EC2 Instance:
+mysql -u root --password="${DBRootPassword}"
+USE ec2db;
+CREATE TABLE table1 (id INT, name VARCHAR(45));
+INSERT INTO table1 VALUES(1, 'Virat'), (2, 'Sachin'), (3, 'Dhoni'), (4, 'ABD');
+SELECT * FROM table1;
+
+Migration of Database in EC2 Instance to RDS Database:
+mysqldump -u root -p ec2db > ec2db.sql
+mysql -h <replace-rds-end-point-here> -P 3306 -u rdsuser -p rdsdb < ec2db.sql
+mysql -h <replace-rds-end-point-here> -P 3306 -u rdsuser -p
+
+USE rdsdb
+SELECT * FROM table1;
